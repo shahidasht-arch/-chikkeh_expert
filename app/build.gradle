@@ -13,17 +13,14 @@ android {
         versionName "1.0"
     }
 
-    signingConfigs {
-        release {
-            // نام فایل از GitHub Secret گرفته می‌شود
-            storeFile file(System.getenv("STORE_FILE"))
-
-            // پسوردها و alias از Secret
-            storePassword System.getenv("KEYSTORE_PASSWORD")
-            keyAlias System.getenv("KEY_ALIAS")
-            keyPassword System.getenv("KEY_PASSWORD")
-        }
+signingConfigs {
+    release {
+        storeFile file("$projectDir/${System.getenv("STORE_FILE")}")
+        storePassword System.getenv("KEYSTORE_PASSWORD")
+        keyAlias System.getenv("KEY_ALIAS")
+        keyPassword System.getenv("KEY_PASSWORD")
     }
+}
 
     buildTypes {
         release {
