@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+
     namespace 'ir.chikkeh.expert'
     compileSdk 34
 
@@ -14,13 +15,13 @@ android {
 
     signingConfigs {
         release {
-            def keystorePath = System.getenv("STORE_FILE")
-            if (keystorePath != null) {
-                storeFile file(keystorePath)
-                storePassword System.getenv("KEYSTORE_PASSWORD")
-                keyAlias System.getenv("KEY_ALIAS")
-                keyPassword System.getenv("KEY_PASSWORD")
-            }
+            // نام فایل از GitHub Secret گرفته می‌شود
+            storeFile file(System.getenv("STORE_FILE"))
+
+            // پسوردها و alias از Secret
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
         }
     }
 
