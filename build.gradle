@@ -1,9 +1,16 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
+android {
+    signingConfigs {
+        release {
+            storeFile file(System.getenv("STORE_FILE") ?: "chikkeh-release.keystore")
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
+        }
     }
-    dependencies {
-        classpath "com.android.tools.build:gradle:7.2.1"
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
     }
 }
