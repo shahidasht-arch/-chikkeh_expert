@@ -24,10 +24,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # ✅ Decode keystore for Release signing
-      - name: Decode release keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > signing.keystore
+- name: Decode release keystore
+  run: |
+    echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/signing.keystore
 
       # ✅ Build Debug APK (برای تست)
       - name: Build Debug APK
