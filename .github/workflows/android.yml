@@ -1,16 +1,14 @@
-name: Build Signed Release APK
+name: Build Release APK
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -19,36 +17,22 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
       - name: Decode release keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/signing.keystore
 
-      # ✅ Build Signed Release APK (VersionCode auto)
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
       - name: Build Release APK
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleRelease -PVERSION_CODE=${{ github.run_number }}
+          VERSION_CODE: ${{ github.run_number }}
+        run: ./gradlew assembleRelease
 
-      # ✅ ZipAlign
-      - name: ZipAlign APK
+      - name: Verify APK signature
         run: |
-          ZIPALIGN=$ANDROID_HOME/build-tools/34.0.0/zipalign
-          $ZIPALIGN -v 4 app/build/outputs/apk/release/*.apk app-release-aligned.apk
-
-      # ✅ Verify APK Signature
-      - name: Verify APK
-        run: |
-          APKSIGNER=$ANDROID_HOME/build-tools/34.0.0/apksigner
-          $APKSIGNER verify app-release-aligned.apk
-
-      # ✅ Upload Final APK
-      - name: Upload Signed Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: chikkeh-release-apk
-          path: app-release-aligned.apk
+          APK=app/build/outputs/apk/release/app-release.apk
+          $ANDROID_HOME/build-tools/34.0.0/apksigner verify --verbose $APK
