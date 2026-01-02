@@ -23,7 +23,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: Decode release keystore
-  run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/signing.keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/signing.keystore
 
       # ✅ Build Signed Release APK (VersionCode auto)
       - name: Build Release APK
@@ -37,9 +38,7 @@ jobs:
       - name: ZipAlign APK
         run: |
           ZIPALIGN=$ANDROID_HOME/build-tools/34.0.0/zipalign
-          $ZIPALIGN -v 4 \
-          app/build/outputs/apk/release/*.apk \
-          app-release-aligned.apk
+          $ZIPALIGN -v 4 app/build/outputs/apk/release/*.apk app-release-aligned.apk
 
       # ✅ Verify APK Signature
       - name: Verify APK
