@@ -14,11 +14,11 @@ android {
         versionName "1.0.${versionCode}"
     }
 
-    signingConfigs {
+   signingConfigs {
     release {
         storeFile file("signing.keystore")
         storePassword System.getenv("KEYSTORE_PASSWORD")
-        keyAlias System.getenv("KEY_ALIAS")
+        keyAlias "chikkeh"
         keyPassword System.getenv("KEY_PASSWORD")
     }
 }
