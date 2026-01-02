@@ -9,19 +9,20 @@ android {
         minSdk 21
         targetSdk 34
 
-        // ✅ VersionCode اتوماتیک (بر اساس GitHub Run Number)
-        versionCode project.hasProperty("VERSION_CODE") ? VERSION_CODE.toInteger() : 1
+        versionCode project.hasProperty("VERSION_CODE")
+                ? VERSION_CODE.toInteger()
+                : 1
         versionName "1.0.${versionCode}"
     }
 
-   signingConfigs {
-    release {
-        storeFile file("signing.keystore")
-        storePassword System.getenv("KEYSTORE_PASSWORD")
-        keyAlias "chikkeh"
-        keyPassword System.getenv("KEY_PASSWORD")
+    signingConfigs {
+        release {
+            storeFile file("signing.keystore")
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
+        }
     }
-}
 
     buildTypes {
         release {
