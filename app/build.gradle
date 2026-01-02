@@ -8,7 +8,7 @@ android {
         applicationId "ir.chikkeh.expert"
         minSdk 21
         targetSdk 34
-        versionCode System.getenv("VERSION_CODE")?.toInteger() ?: 1
+        versionCode 1
         versionName "1.0"
     }
 
@@ -16,7 +16,7 @@ android {
         release {
             storeFile file("signing.keystore")
             storePassword System.getenv("KEYSTORE_PASSWORD")
-            keyAlias System.getenv("KEY_ALIAS")
+            keyAlias System.getenv("KEY_ALIAS")   // chikkeh
             keyPassword System.getenv("KEY_PASSWORD")
         }
     }
