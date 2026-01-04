@@ -9,39 +9,43 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 🚨 Step حیاتی: رفع خطای Permission denied
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '17'
 
-      # --- HARD RESET gradle offline & user cache (رفع مشکل 403 Forbidden) ---
+      # --- Force disable Gradle offline & daemon ---
       - name: Force disable Gradle offline
         run: |
           mkdir -p ~/.gradle
           echo "org.gradle.offline=false" > ~/.gradle/gradle.properties
           echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
           cat ~/.gradle/gradle.properties
-      
+
       # --- Decode keystore ---
       - name: Decode signing keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/signing.keystore
           ls -lh app/signing.keystore
 
-      # --- Sanity check (فقط برای اطمینان از صحت سکرت‌ها) ---
+      # --- Verify keystore ---
       - name: Verify keystore alias
         run: |
           keytool -list -keystore app/signing.keystore \
-            -storepass "${{ secrets.KEYSTORE_PASSWORD }}"
+            -storepass "$KEYSTORE_PASSWORD"
 
       # --- Build ---
       - name: Clean project
@@ -50,15 +54,14 @@ jobs:
       - name: Assemble Release APK
         run: ./gradlew assembleRelease --no-build-cache --no-daemon
 
-      # --- Verify EXACT final APK (حل مشکل Signature stripped? v2) ---
+      # --- Verify APK signature (SAFE) ---
       - name: Verify APK signature
         run: |
-          # مسیر خروجی نهایی TWA
           APK=app/build/outputs/apk/release/app-release.apk
           ls -lh $APK
-          
-          # استفاده از Build Tools برای تایید امضا
-          $ANDROID_HOME/build-tools/34.0.0/apksigner verify --verbose $APK
+
+          BUILD_TOOLS=$(ls $ANDROID_HOME/build-tools | sort -V | tail -n 1)
+          $ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner verify --verbose $APK
 
       # --- Upload artifact ---
       - name: Upload release APK
