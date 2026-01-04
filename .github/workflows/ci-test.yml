@@ -33,10 +33,7 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
-
+      
       # --------------------------------------------------
       # Gradle safety config
       # --------------------------------------------------
